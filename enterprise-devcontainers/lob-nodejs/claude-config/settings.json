@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)"
+    ],
+    "deny": [
+      "Bash(npm install:*)",
+      "Bash(yarn:*)"
+    ]
+  }
+}

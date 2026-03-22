@@ -1,0 +1,32 @@
+#!/bin/sh
+# Pre-commit hook: scan staged files for secrets using detect-secrets.
+# Automatically applied to all repos via git init.templateDir.
+
+if ! command -v detect-secrets >/dev/null 2>&1; then
+    echo "[detect-secrets] Not installed — skipping secret scan"
+    exit 0
+fi
+
+# Get staged files
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$STAGED" ]; then
+    exit 0
+fi
+
+# Scan staged files for secrets
+echo "$STAGED" | xargs detect-secrets scan --list-all-plugins 2>/dev/null | \
+    detect-secrets audit --report --json 2>/dev/null | \
+    grep -q '"is_secret": true' && {
+        echo ""
+        echo "============================================"
+        echo "  [BLOCKED] Potential secrets detected!"
+        echo "============================================"
+        echo ""
+        echo "  Staged files contain what appear to be secrets."
+        echo "  Run: detect-secrets scan <file> to inspect."
+        echo "  Use: git commit --no-verify to bypass (not recommended)."
+        echo ""
+        exit 1
+    }
+
+exit 0

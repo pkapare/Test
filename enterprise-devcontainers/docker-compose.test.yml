@@ -1,0 +1,215 @@
+# =============================================================================
+# Testing Compose — spin up any/all containers for local validation
+# Usage:
+#   docker compose -f docker-compose.test.yml up -d                # all
+#   docker compose -f docker-compose.test.yml up -d project-two    # one service
+#   docker compose -f docker-compose.test.yml down                 # teardown
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # TIER 0 — Core (CLI-only sanity check)
+  # ---------------------------------------------------------------------------
+  core:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-core:latest
+    container_name: test-core
+    hostname: core
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    command: sleep infinity
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  # ---------------------------------------------------------------------------
+  # TIER 1 — IDE Variants
+  # ---------------------------------------------------------------------------
+  vscode-serveweb:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-vscode-serveweb:latest
+    container_name: test-vscode-serveweb
+    hostname: vscode-serveweb
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_SERVEWEB_WEB:-8301}:${PORT_SERVE_WEB:-8229}"
+    command: bash -c "/usr/local/bin/start-serve-web.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  vscode-codeserver:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-vscode-codeserver:latest
+    container_name: test-vscode-codeserver
+    hostname: vscode-codeserver
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_CODESERVER_WEB:-8302}:${PORT_CODE_SERVER:-8228}"
+    command: bash -c "/usr/local/bin/start-code-server.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  jetbrains:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-jetbrains:latest
+    container_name: test-jetbrains
+    hostname: jetbrains
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_JETBRAINS_SSH:-2201}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-ssh.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  headless:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-headless:latest
+    container_name: test-headless
+    hostname: headless
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    command: bash -c "/usr/local/bin/start-headless.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  universal:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/org-base-universal:latest
+    container_name: test-universal
+    hostname: universal
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_UNIVERSAL_WEB:-8304}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_UNIVERSAL_SSH:-2204}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  # ---------------------------------------------------------------------------
+  # TIER 2 — LOB / Stack
+  # ---------------------------------------------------------------------------
+  lob-dotnet:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/lob-dotnet:latest
+    container_name: test-lob-dotnet
+    hostname: lob-dotnet
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_LOB_DOTNET_WEB:-8305}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_LOB_DOTNET_SSH:-2205}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  lob-nodejs:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/lob-nodejs:latest
+    container_name: test-lob-nodejs
+    hostname: lob-nodejs
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_LOB_NODEJS_WEB:-8306}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_LOB_NODEJS_SSH:-2206}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  # ---------------------------------------------------------------------------
+  # TIER 3 — Projects
+  # ---------------------------------------------------------------------------
+  project-one:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/project-one:latest
+    container_name: test-project-one
+    hostname: project-one
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_PROJECT_ONE_WEB:-8311}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_PROJECT_ONE_SSH:-2211}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  project-two:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/project-two:latest
+    container_name: test-project-two
+    hostname: project-two
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_PROJECT_TWO_WEB:-8312}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_PROJECT_TWO_SSH:-2212}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+  project-three:
+    image: ${REGISTRY:-kapconreg.azurecr.io/devcontainers}/project-three:latest
+    container_name: test-project-three
+    hostname: project-three
+    cap_add: [NET_ADMIN, NET_RAW]
+    tmpfs:
+      - /tmp:size=${TMPFS_TMP_SIZE:-256m}
+      - /run:size=${TMPFS_RUN_SIZE:-64m}
+    ports:
+      - "${HOST_PORT_PROJECT_THREE_WEB:-8313}:${PORT_SERVE_WEB:-8229}"
+      - "${HOST_PORT_PROJECT_THREE_SSH:-2213}:${PORT_SSH:-2222}"
+    command: bash -c "/usr/local/bin/start-universal.sh && sleep infinity"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    secrets:
+      - anthropic_api_key
+      - github_token
+
+secrets:
+  anthropic_api_key:
+    environment: ANTHROPIC_API_KEY
+  github_token:
+    environment: GITHUB_TOKEN

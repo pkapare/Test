@@ -1,0 +1,1 @@
+Run all tests with `dotnet test --verbosity normal`. Group results by project. For any failures, show the full stack trace and the relevant source code around the failing assertion. Suggest a fix for each failure.

@@ -1,0 +1,1 @@
+Analyze the agent definitions in the codebase. List all registered agents with their descriptions, tool permissions, and orchestration dependencies. Identify agents that lack proper guardrails configuration or observability hooks. Suggest improvements based on the BYO adapter pattern.
