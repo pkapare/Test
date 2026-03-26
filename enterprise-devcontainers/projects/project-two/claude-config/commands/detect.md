@@ -1,1 +1,0 @@
-Analyze the Detection Engine bounded context. List all detection models found in the codebase, their jurisdictions, asset classes, and alert thresholds. Identify any models that are missing unit tests or have TODO comments. Suggest improvements to detection logic based on the regulatory requirements in the CLAUDE.md context.

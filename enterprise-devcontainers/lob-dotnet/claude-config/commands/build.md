@@ -1,1 +1,0 @@
-Build the solution. Run `dotnet build` in the repository root. Report any errors with file paths and line numbers. If the build succeeds, run `dotnet test --no-build --verbosity minimal` and report test results.

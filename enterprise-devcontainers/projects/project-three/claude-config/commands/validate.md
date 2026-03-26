@@ -1,1 +1,0 @@
-Run the CDM validation suite against the current trade sample data. Report validation failures grouped by jurisdiction and rule category. For each failure, show the CDM path, expected value, actual value, and the RUNE DSL rule that triggered it. Suggest data fixes or rule adjustments.
